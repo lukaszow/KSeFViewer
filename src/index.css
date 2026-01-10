@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+    .font-serif {
+        font-family: 'Times New Roman', serif;
+    }
+}
+
+@media print {
+    @page {
+        margin: 0;
+        size: auto;
+    }
+
+    body {
+        background: white;
+    }
+
+    /* Hide everything except the invoice container when printing */
+    body>div>header,
+    body>div>main>div>div>div:first-child:not(.bg-white) {
+        /* Trying to target navbar/bg */
+        display: none !important;
+    }
+
+    /* Reset positioning for print */
+    main {
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+        max-width: none !important;
+    }
+
+    /* Ensure specific A4 container prints well */
+    .shadow-lg {
+        box-shadow: none !important;
+    }
+
+    .bg-slate-100\/50,
+    .bg-slate-50 {
+        background-color: white !important;
+    }
+}
