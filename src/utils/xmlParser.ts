@@ -35,12 +35,14 @@ export interface InvoiceData {
 const parser = new XMLParser({
     ignoreAttributes: false,
     attributeNamePrefix: "@_",
+    parseTagValue: false, // Ensure NIP and other numeric strings stay as strings
     // Strip namespaces (e.g. ns:Faktura -> Faktura)
     transformTagName: (tagName) => {
         const i = tagName.indexOf(':');
         return i > -1 ? tagName.substring(i + 1) : tagName;
     }
 });
+
 
 export const parseKsefXml = (xmlContent: string): InvoiceData | null => {
     try {
@@ -55,8 +57,10 @@ export const parseKsefXml = (xmlContent: string): InvoiceData | null => {
         }
 
         const header = root.Naglowek || {};
+        const fa = root.Fa || {};
         const seller = root.Podmiot1 || {};
         const buyer = root.Podmiot2 || {};
+
         // Robust extraction for items
         // FA(2) often uses FakturaWiersz, FA(3) uses FaWiersz inside Fa element
         let details = root.FakturaWiersz || root.FaWiersz;
@@ -75,48 +79,64 @@ export const parseKsefXml = (xmlContent: string): InvoiceData | null => {
         }
 
         // Helper to extract nested P_ fields safely
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const getVal = (obj: any, key: string, def: any = "") => obj?.[key] || def;
 
-        // Seller Data Extraction (Dane identyfikacyjne + Adres)
-        const sIdent = seller.DaneIdentyfikacyjne || {};
-        const sAddr = seller.Adres || {};
-        const sAdresLonia = sAddr.AdresPol || sAddr.AdresZagr || {};
+        // In FA(3) P_1, P_2, P_1M are often in <Fa>, in FA(2) in <Naglowek>
+        const getHeaderVal = (key: string) => getVal(fa, key) || getVal(header, key);
 
-        // Buyer Data Extraction
+        // Address Extraction Helper
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const extractAddress = (podmiot: any) => {
+            const addr = podmiot.Adres || {};
+            // Try structured address (AdresPol/AdresZagr)
+            const structured = addr.AdresPol || addr.AdresZagr;
+            if (structured) {
+                return [
+                    getVal(structured, 'Ulica'),
+                    getVal(structured, 'NrDomu'),
+                    getVal(structured, 'NrLokalu') ? "/" + getVal(structured, 'NrLokalu') : "",
+                    ",",
+                    getVal(structured, 'KodPocztowy'),
+                    getVal(structured, 'Miejscowosc')
+                ].filter(Boolean).join(" ");
+            }
+            // Try unstructured address (AdresL1, AdresL2...)
+            const lines = [
+                getVal(addr, 'AdresL1'),
+                getVal(addr, 'AdresL2'),
+                getVal(addr, 'AdresL3'),
+                getVal(addr, 'AdresL4'),
+                getVal(addr, 'AdresL5'),
+                getVal(addr, 'AdresL6')
+            ].filter(Boolean);
+
+            if (lines.length > 0) return lines.join(", ");
+
+            return "";
+        };
+
+        // Seller/Buyer Data Extraction
+        const sIdent = seller.DaneIdentyfikacyjne || {};
         const bIdent = buyer.DaneIdentyfikacyjne || {};
-        const bAddr = buyer.Adres || {};
-        const bAdresLonia = bAddr.AdresPol || bAddr.AdresZagr || {};
 
         return {
             header: {
-                number: getVal(header, 'P_2') || "BRAK",
-                date: getVal(header, 'P_1'),
-                place: getVal(header, 'P_1M'),
+                number: getHeaderVal('P_2') || "BRAK",
+                date: getHeaderVal('P_1'),
+                place: getHeaderVal('P_1M'),
             },
             seller: {
                 name: getVal(sIdent, 'Nazwa') || (getVal(sIdent, 'ImiePierwsze') + " " + getVal(sIdent, 'Nazwisko')),
                 nip: getVal(sIdent, 'NIP'),
-                address: [
-                    getVal(sAdresLonia, 'Ulica'),
-                    getVal(sAdresLonia, 'NrDomu'),
-                    getVal(sAdresLonia, 'NrLokalu') ? "/" + getVal(sAdresLonia, 'NrLokalu') : "",
-                    ",",
-                    getVal(sAdresLonia, 'KodPocztowy'),
-                    getVal(sAdresLonia, 'Miejscowosc')
-                ].filter(Boolean).join(" "),
+                address: extractAddress(seller),
             },
             buyer: {
                 name: getVal(bIdent, 'Nazwa') || (getVal(bIdent, 'ImiePierwsze') + " " + getVal(bIdent, 'Nazwisko')),
                 nip: getVal(bIdent, 'NIP'),
-                address: [
-                    getVal(bAdresLonia, 'Ulica'),
-                    getVal(bAdresLonia, 'NrDomu'),
-                    getVal(bAdresLonia, 'NrLokalu') ? "/" + getVal(bAdresLonia, 'NrLokalu') : "",
-                    ",",
-                    getVal(bAdresLonia, 'KodPocztowy'),
-                    getVal(bAdresLonia, 'Miejscowosc')
-                ].filter(Boolean).join(" "),
+                address: extractAddress(buyer),
             },
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             items: itemsList.map((item: any) => ({
                 name: getVal(item, 'P_7'),
                 quantity: Number(getVal(item, 'P_8B')),
@@ -124,13 +144,14 @@ export const parseKsefXml = (xmlContent: string): InvoiceData | null => {
                 netPrice: Number(getVal(item, 'P_9A')),
                 netValue: Number(getVal(item, 'P_11')),
                 vatRate: String(getVal(item, 'P_12')),
-            })).filter((i: any) => i.name), // Filter out empty or structural rows if any
+            })).filter((i: { name?: string }) => i.name), // Filter out empty or structural rows if any
             summary: {
                 net: Number(getVal(summary, 'P_13_1', 0)) + Number(getVal(summary, 'P_13_2', 0)) + Number(getVal(summary, 'P_13_3', 0)), // Simplification: Summing net bases
                 vat: Number(getVal(summary, 'P_14_1', 0)) + Number(getVal(summary, 'P_14_2', 0)) + Number(getVal(summary, 'P_14_3', 0)),
                 gross: Number(getVal(summary, 'P_15', 0)),
             }
         };
+
 
     } catch (e) {
         console.error("Parsing Error", e);
