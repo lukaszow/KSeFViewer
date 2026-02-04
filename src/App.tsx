@@ -1,6 +1,7 @@
 import { useState, DragEvent, ChangeEvent } from 'react';
 import { parseKsefXml, InvoiceData, DEMO_INVOICE } from './utils/xmlParser';
 import InvoicePreview from './components/InvoicePreview';
+import SecurityInfo from './components/ui/SecurityInfo';
 import logoImg from './assets/czytajksef.png';
 
 function App() {
@@ -186,6 +187,8 @@ function App() {
                                 </div>
                             )}
                         </div>
+
+                        <SecurityInfo />
                     </div>
                 ) : (
                     /* Viewer State */
