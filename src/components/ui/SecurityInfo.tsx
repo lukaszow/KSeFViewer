@@ -11,7 +11,22 @@ const SecurityInfo: React.FC = () => {
     { icon: <Lock className="w-5 h-5" />, text: "Przetwarzanie lokalne (No Server-Side)" },
     { icon: <ShieldCheck className="w-5 h-5" />, text: "Pełna zgodność z wymogami RODO" },
     { icon: <EyeOff className="w-5 h-5" />, text: "Brak logowania treści faktur" },
-    { icon: <Code className="w-5 h-5" />, text: "Transparentny kod Open Source" },
+    {
+      icon: <Code className="w-5 h-5" />,
+      text: (
+        <>
+          Transparentny kod{" "}
+          <a
+            href="https://github.com/lukaszow/KSeFViewer"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:underline"
+          >
+            Open Source
+          </a>
+        </>
+      )
+    },
   ];
 
   return (
@@ -24,11 +39,11 @@ const SecurityInfo: React.FC = () => {
           <h3 className="text-lg font-semibold text-slate-900 mb-2">
             Nota o bezpieczeństwie i prywatności
           </h3>
-          <p className="text-slate-600 leading-relaxed text-sm md:text-base">
-            Architektura systemu <strong>CzytajKSEF.pl</strong> została zaprojektowana w oparciu 
-            o model <em>Zero-Knowledge</em>. Nie gromadzimy, nie przetwarzamy ani nie logujemy 
-            treści udostępnianych plików XML. Narzędzie służy wyłącznie do interpretacji lokalnej 
-            kodu faktury na czytelny format wizualny, zapewniając najwyższy standard ochrony 
+          <p className="text-slate-600 leading-relaxed text-xs md:text-sm">
+            Architektura systemu <strong>CzytajKSEF.pl</strong> została zaprojektowana w oparciu
+            o model <em>Zero-Knowledge</em>. Nie gromadzimy, nie przetwarzamy ani nie logujemy
+            treści udostępnianych plików XML. Narzędzie służy wyłącznie do interpretacji lokalnej
+            kodu faktury na czytelny format wizualny, zapewniając najwyższy standard ochrony
             tajemnicy przedsiębiorstwa.
           </p>
         </div>

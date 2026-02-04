@@ -1,6 +1,13 @@
 # KSeF Viewer
 
-Minimal React application for viewing Polish KSeF (Krajowy System e-Faktur) XML invoices.
+Minimal, **privacy-first** React application for viewing Polish KSeF (Krajowy System e-Faktur) XML invoices. Designed with a **Zero-Knowledge** architecture.
+
+## Security & Privacy (Zero-Knowledge)
+
+This application is built to ensure maximum data privacy:
+- **Local Processing:** All XML parsing and data extraction happen entirely in your browser.
+- **No Server-Side:** Your invoice data never leaves your computer. We do not have a backend that stores or logs your files.
+- **Open Source:** The code is [transparent and open source](https://github.com/lukaszow/KSeFViewer) for Anyone to audit.
 
 ## Technology Stack
 
@@ -72,16 +79,17 @@ npm run preview
 
 ```
 src/
-├── components/          # React components
-│   └── InvoiceViewer.tsx
+├── assets/             # Static assets (logos, etc.)
+├── components/         # React components
+│   ├── ui/             # Reusable UI components
+│   │   └── SecurityInfo.tsx
+│   └── InvoicePreview.tsx # Main invoice visualization
 ├── utils/              # Utility functions
-│   ├── xmlParser.ts
-│   └── __tests__/
-│       └── xmlParser.test.ts
-├── assets/             # Static assets
-├── App.tsx             # Main application component
+│   ├── xmlParser.ts    # XML to JSON conversion logic
+│   └── __tests__/      # Unit tests
+├── App.tsx             # Main application layout and state
 ├── main.tsx            # Application entry point
-└── index.css           # Global styles
+└── index.css           # Global Tailwind styles
 ```
 
 ## Build & Deployment
