@@ -2,6 +2,13 @@
 
 Minimal, **privacy-first** React application for viewing Polish KSeF (Krajowy System e-Faktur) XML invoices. Designed with a **Zero-Knowledge** architecture.
 
+## 🤖 AI Interaction (Session Bootstrap)
+
+To start a new session with full engineering context and save LLM token limits, paste the following prompt:
+
+> **Prompt:** Start session. I have created the configuration files (`AI_RULES.md`, `STRUCTURE.md`, `DOCS_KSEF_SCHEMA.md`). Please analyze them first to understand the project architecture, tech stack, and KSeF domain rules.
+
+
 ## Security & Privacy (Zero-Knowledge)
 
 This application is built to ensure maximum data privacy:
