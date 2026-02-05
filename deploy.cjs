@@ -12,7 +12,7 @@ async function deploy() {
 
     const config = {
         host: process.env.DEPLOY_HOST,
-        port: 2222, // Standard port for SFTP/SSH
+        port: 10022, // Standard port for SFTP/SSH
         username: process.env.DEPLOY_USER,
         password: process.env.DEPLOY_PASS,
     };
