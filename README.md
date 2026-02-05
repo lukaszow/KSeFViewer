@@ -103,9 +103,9 @@ src/
 
 ### Build Configuration
 - **Build tool**: Vite
-- **Output directory**: `disc/` (custom configuration)
+- **Output directory**: `dist/` (custom configuration)
 - **Type checking**: Enabled via `tsc && vite build`
 - **Asset optimization**: Automatic
 
 ### Deployment
-The application builds to static files in the `disc/` directory, suitable for deployment to any static hosting service.
+The application builds to static files in the `dist/` directory, suitable for deployment to any static hosting service.
