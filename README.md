@@ -16,6 +16,24 @@ This application is built to ensure maximum data privacy:
 - **No Server-Side:** Your invoice data never leaves your computer. We do not have a backend that stores or logs your files.
 - **Open Source:** The code is [transparent and open source](https://github.com/lukaszow/KSeFViewer) for Anyone to audit.
 
+### Input Validation & File Safety
+
+- **Extension + MIME type check:** Only files with `.xml` extension and `application/xml` / `text/xml` MIME type are accepted.
+- **File size limit:** Files larger than 10 MB are rejected before reading.
+
+### XML Parser Hardening
+
+- **Entity processing disabled** (`processEntities: false`): prevents XXE (XML External Entity) injection and XML-bomb / billion-laughs attacks.
+- **Size guard:** XML content exceeding 10 MB is rejected before parsing.
+
+### HTTP Security Headers
+
+The following headers are set via `<meta>` tags in `index.html`:
+
+- **Content-Security-Policy:** restricts script, style, and resource origins to `'self'`, blocking injected scripts.
+- **X-Content-Type-Options: nosniff** — prevents MIME-type sniffing attacks.
+- **X-Frame-Options: DENY** — prevents clickjacking by disallowing iframe embedding.
+
 ## Technology Stack
 
 ### Core Framework

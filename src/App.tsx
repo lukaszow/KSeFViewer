@@ -22,6 +22,14 @@ function App() {
             setError('Proszę przesłać poprawny plik XML.');
             return;
         }
+        if (file.type && !['application/xml', 'text/xml'].includes(file.type)) {
+            setError('Proszę przesłać poprawny plik XML.');
+            return;
+        }
+        if (file.size > 10 * 1024 * 1024) {
+            setError('Plik jest zbyt duży. Maksymalny rozmiar to 10 MB.');
+            return;
+        }
 
         const reader = new FileReader();
         reader.onload = (e) => {

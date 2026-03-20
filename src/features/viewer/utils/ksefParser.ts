@@ -1,11 +1,16 @@
 import { XMLParser } from 'fast-xml-parser';
 import { KSeFRoot, KSeFInvoice } from '../../../core/types/ksef.types';
 
+// 10 MB limit — generous for any real KSeF invoice
+const MAX_XML_SIZE = 10 * 1024 * 1024;
+
 const parser = new XMLParser({
     ignoreAttributes: false,
     attributeNamePrefix: '', // No prefix for easier access
     parseTagValue: true,
     trimValues: true,
+    // Disable entity processing to prevent XXE and XML-bomb attacks
+    processEntities: false,
     // KSeF XML usually has namespaces like <ns:Faktura>
     // We want to normalize them to just the tag names
     transformTagName: (tagName) => {
@@ -19,6 +24,10 @@ const parser = new XMLParser({
  * Validates basic structure based on DOCS_KSEF_SCHEMA.md.
  */
 export const parseKsefXml = (xmlString: string): KSeFInvoice | null => {
+    if (xmlString.length > MAX_XML_SIZE) {
+        console.error('XML file exceeds maximum allowed size.');
+        return null;
+    }
     try {
         const jsonObj: KSeFRoot = parser.parse(xmlString);
 
