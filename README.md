@@ -37,35 +37,38 @@ The following headers are set via `<meta>` tags in `index.html`:
 ## Technology Stack
 
 ### Core Framework
-- **React**: 18.2.0 - UI framework
-- **TypeScript**: 5.2.0 - Type-safe JavaScript
-- **Vite**: 5.0.0 - Build tool and development server
+
+- **React**: 19.2.4 - UI framework
+- **TypeScript**: 5.9.3 - Type-safe JavaScript
+- **Vite**: 8.0.1 - Build tool and development server
 
 ### Styling
-- **Tailwind CSS**: 3.4.1 - Utility-first CSS framework
-- **PostCSS**: 8.4.35 - CSS processing
-- **Autoprefixer**: 10.4.17 - CSS vendor prefixing
-- **tailwind-merge**: 2.2.0 - Utility class merging
+
+- **Tailwind CSS**: 4.2.2 - Utility-first CSS framework (Vite plugin, no PostCSS required)
+- **tailwind-merge**: 3.5.0 - Utility class merging
 - **clsx**: 2.1.0 - Conditional className utility
 
 ### XML Processing
-- **fast-xml-parser**: 4.3.0 - XML parsing and validation
+
+- **fast-xml-parser**: 5.5.8 - XML parsing and validation
 
 ### Code Quality
-- **ESLint**: 8.56.0 - Code linting
-- **@typescript-eslint/eslint-plugin**: 6.0.0 - TypeScript linting rules
-- **@typescript-eslint/parser**: 6.0.0 - TypeScript parser for ESLint
-- **eslint-plugin-react-hooks**: 4.6.0 - React hooks linting
-- **eslint-plugin-react-refresh**: 0.4.5 - React refresh linting
+
+- **ESLint**: 9.39.4 - Code linting (flat config)
+- **typescript-eslint**: 8.57.1 - TypeScript linting rules and parser
+- **eslint-plugin-react-hooks**: 5.2.0 - React hooks linting
+- **eslint-plugin-react-refresh**: 0.5.2 - React refresh linting
 
 ### Testing
-- **Vitest**: 4.0.17 - Unit testing framework
-- **jsdom**: 27.4.0 - DOM environment for testing
+
+- **Vitest**: 4.1.0 - Unit testing framework
+- **jsdom**: 29.0.1 - DOM environment for testing
 
 ### Type Definitions
-- **@types/react**: 18.2.0 - React type definitions
-- **@types/react-dom**: 18.2.0 - React DOM type definitions
-- **@types/node**: 25.0.9 - Node.js type definitions
+
+- **@types/react**: 19.2.14 - React type definitions
+- **@types/react-dom**: 19.2.3 - React DOM type definitions
+- **@types/node**: 25.5.0 - Node.js type definitions
 
 ## Development Setup
 
