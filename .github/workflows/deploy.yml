@@ -29,10 +29,15 @@ jobs:
         run: npm run build
 
       - name: Validate FTP secrets
-        if: ${{ secrets.FTP_SERVER == '' || secrets.FTP_USERNAME == '' || secrets.FTP_PASSWORD == '' }}
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
         run: |
-          echo "::error::Missing required secrets (FTP_SERVER, FTP_USERNAME, FTP_PASSWORD). Add them in Settings -> Secrets and variables -> Actions and re-run."
-          exit 1
+          if [ -z "$FTP_SERVER" ] || [ -z "$FTP_USERNAME" ] || [ -z "$FTP_PASSWORD" ]; then
+            echo "::error::Missing required secrets (FTP_SERVER, FTP_USERNAME, FTP_PASSWORD). Add them in Settings -> Secrets and variables -> Actions and re-run."
+            exit 1
+          fi
 
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
