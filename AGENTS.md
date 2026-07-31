@@ -8,13 +8,9 @@ Client-side React SPA (Vite + React 19 + TS strict + Tailwind v4 via Vite plugin
 - `npm run build` - `tsc && vite build`. This is the typecheck command; there is no separate `typecheck` script. Fails on any unused local/param (`noUnusedLocals`/`noUnusedParameters`) — never ship dead code.
 - `npm run lint` - ESLint flat config, `--max-warnings 0`: a single warning fails lint. `react-refresh/only-export-components` is a warning here.
 - `npm run preview` - serve the production build.
-- `npm run deploy` - `node deploy.cjs` (see Env/Deploy below).
 - No `test` script exists. Vitest is a devDependency but there are **no test files** in the repo; README/STRUCTURE.md claims a `src/utils/__tests__` dir that doesn't exist. Don't assume a test suite.
 
-## Env / Deploy gotchas
-
-- `deploy.cjs` reads `DEPLOY_HOST`, `DEPLOY_USER`, `DEPLOY_PASS`, `DEPLOY_REMOTE_PATH`, but `.env.example` documents `SFTP_*` names. The script will not pick up the documented vars. Deploy also hardcodes SFTP port `10022` and defaults remote path to `/public_html`; target is czytajksef.pl.
-- Local dev needs no env file.
+- No env file is needed for local dev.
 
 ## Security invariants (do not regress)
 
