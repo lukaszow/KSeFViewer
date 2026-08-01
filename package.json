@@ -1,8 +1,12 @@
 {
   "name": "ksef-xml-viewer",
-  "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "Privacy-first, zero-knowledge client-side viewer for Polish KSeF XML invoices",
+  "license": "MIT",
   "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
