@@ -4,6 +4,7 @@ import { parseKsefXml } from './features/viewer/utils/ksefParser';
 import { DEMO_INVOICE } from './core/config/demoData';
 
 // UI Components
+import AppVersion from './components/ui/AppVersion';
 import Button from './components/ui/Button';
 import FileDropzone from './components/ui/FileDropzone';
 import SecurityInfo from './components/ui/SecurityInfo';
@@ -150,6 +151,8 @@ function App() {
                     Built with Privacy & Precision • 2026
                 </p>
             </footer>
+
+            <AppVersion />
         </div>
     );
 }
