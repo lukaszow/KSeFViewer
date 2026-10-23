@@ -16,22 +16,20 @@
         background: white;
     }
 
-    /* Hide everything except the invoice container when printing */
-    body>div>header,
-    body>div>main>div>div>div:first-child:not(.bg-white) {
-        /* Trying to target navbar/bg */
-        display: none !important;
-    }
-
-    /* Reset positioning for print */
+    /* Reset positioning for print (navbar and footer use `print:hidden`) */
     main {
         padding: 0 !important;
         margin: 0 !important;
         width: 100% !important;
         max-width: none !important;
+        overflow: visible !important;
     }
 
-    /* Ensure specific A4 container prints well */
+    article {
+        min-height: auto !important;
+        box-shadow: none !important;
+    }
+
     .shadow-lg {
         box-shadow: none !important;
     }

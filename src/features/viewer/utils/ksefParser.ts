@@ -1,13 +1,22 @@
 import { XMLParser } from 'fast-xml-parser';
 import { KSeFRoot, KSeFInvoice } from '../../../core/types/ksef.types';
+import { MAX_FILE_SIZE } from '../../../core/utils/fileValidation';
 
-// 10 MB limit — generous for any real KSeF invoice
-const MAX_XML_SIZE = 10 * 1024 * 1024;
+// Same limit as the upload guard in `fileValidation.ts`.
+export const MAX_XML_SIZE = MAX_FILE_SIZE;
+
+export type ParseErrorCode = 'too_large' | 'invalid_xml' | 'not_ksef' | 'missing_sections';
+
+export type RawParseResult =
+    | { ok: true; raw: KSeFInvoice }
+    | { ok: false; error: ParseErrorCode };
 
 const parser = new XMLParser({
     ignoreAttributes: false,
     attributeNamePrefix: '', // No prefix for easier access
-    parseTagValue: true,
+    // Keep all values as strings: automatic coercion corrupts identifiers
+    // (leading zeros in NIP, bank account numbers, numeric invoice numbers).
+    parseTagValue: false,
     trimValues: true,
     // Disable entity processing to prevent XXE and XML-bomb attacks
     processEntities: false,
@@ -19,39 +28,32 @@ const parser = new XMLParser({
     },
 });
 
+const isObject = (value: unknown): value is Record<string, unknown> =>
+    typeof value === 'object' && value !== null;
+
 /**
- * Parses raw XML string into a KSeFInvoice object.
- * Validates basic structure based on DOCS_KSEF_SCHEMA.md.
+ * Parses raw XML into the FA(3) structure and validates the sections required by the viewer.
+ * Never throws — failures are reported as a typed error code so the UI can show a precise message.
  */
-export const parseKsefXml = (xmlString: string): KSeFInvoice | null => {
-    if (xmlString.length > MAX_XML_SIZE) {
-        console.error('XML file exceeds maximum allowed size.');
-        return null;
+export const parseKsefXml = (xmlString: string): RawParseResult => {
+    if (new TextEncoder().encode(xmlString).byteLength > MAX_XML_SIZE) {
+        return { ok: false, error: 'too_large' };
     }
+
+    let parsed: KSeFRoot;
     try {
-        const jsonObj: KSeFRoot = parser.parse(xmlString);
-
-        if (!jsonObj || !jsonObj.Faktura) {
-            console.error('Invalid KSeF XML: Root <Faktura> element not found.');
-            return null;
-        }
-
-        const invoice = jsonObj.Faktura;
-
-        // Basic validation of required sections
-        if (!invoice.Naglowek || !invoice.Podmiot1 || !invoice.Podmiot2 || !invoice.Fa) {
-            console.error('Invalid KSeF XML: Missing core sections (Naglowek, Podmiot1, Podmiot2, or Fa).');
-            return null;
-        }
-
-        // Ensure FaWiersz is always an array for easier mapping
-        if (invoice.Fa.FaWiersz && !Array.isArray(invoice.Fa.FaWiersz)) {
-            invoice.Fa.FaWiersz = [invoice.Fa.FaWiersz];
-        }
-
-        return invoice;
-    } catch (error) {
-        console.error('Error parsing KSeF XML:', error);
-        return null;
+        parsed = parser.parse(xmlString) as KSeFRoot;
+    } catch {
+        return { ok: false, error: 'invalid_xml' };
     }
+
+    const invoice = parsed?.Faktura;
+    if (!isObject(invoice)) {
+        return { ok: false, error: 'not_ksef' };
+    }
+    if (!isObject(invoice.Fa) || !isObject(invoice.Podmiot1) || !isObject(invoice.Podmiot2)) {
+        return { ok: false, error: 'missing_sections' };
+    }
+
+    return { ok: true, raw: invoice };
 };
